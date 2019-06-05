@@ -1,0 +1,11 @@
+{
+  /*
+   * comments
+  */
+
+  "Version": "2.0",
+  "Author": {
+    "Name": "Foo",
+    "Email": "bar@example.com"
+  }
+}
