@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dbstair/cmd/dbstair-cli/utils"
 	"fmt"
 	"log"
 	"os"
@@ -59,4 +60,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("calling from :", utils.CurrentFile())
 }
