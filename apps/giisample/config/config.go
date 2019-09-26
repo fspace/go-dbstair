@@ -6,6 +6,8 @@ import (
 )
 
 type Config struct {
+	Listen string // :6666
+
 	DbUser string // = "root"
 	DbPass string // = ""
 	DbHost string //= "127.0.0.1"
@@ -33,6 +35,8 @@ func (c *Config) Configure(cfg interface{}, section ...string) error {
 }
 
 var DefaultConfig = Config{
+	Listen: ":6666",
+
 	DbUser: "root",
 	DbPass: "",
 	DbHost: "127.0.0.1",
