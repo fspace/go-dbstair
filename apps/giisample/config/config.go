@@ -12,23 +12,28 @@ type Config struct {
 	DbPass string // = ""
 	DbHost string //= "127.0.0.1"
 	DbPort int    //= 3306
+	DbName string // = "go_blog"
 
+	// 用来支持其他可能的配置
 	DbDriver      string // mysql
 	DataSourceFmt string // TODO  后续提供根据不同的驱动  生成不同的数据源功能 每个驱动类型的数据源格式还不一样
 
 	APPName string `default:"app name"`
-	// 原始配置对象 Original Configor
+
+	// /+ ========================================================================================================= +\
+	// ## 原始配置对象 Original Configor
 	// Raw *config.Config
 	raw         *ini.File // TODO 这里保存原始配置对象是为了以后用 可以考虑改为提供Load|Populate|Configure 方法
 	configPaths []string
+	// \+ ========================================================================================================= +/
 }
 
 // Configure populate the cfg object from the original configuration
 // 以此可以实现 分次提取配置
 func (c *Config) Configure(cfg interface{}, section ...string) error {
-	var sec string
+	// var sec string
 	if len(section) > 0 {
-		sec = strings.Join(section, ".")
+		sec := strings.Join(section, ".")
 		return c.raw.Section(sec).MapTo(cfg)
 	}
 	return c.raw.MapTo(cfg)
