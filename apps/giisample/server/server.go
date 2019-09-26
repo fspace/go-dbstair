@@ -32,6 +32,7 @@ func New(conf *config.Config) Server {
 }
 
 func (s *server) Init() error {
+	// 此步里面的Router 只要满足接口条件 可以用任何出名的包来替换哦！
 	s.Router = mux.NewRouter()
 	// This will serve files under http://localhost:8000/static/<filename>
 	// s.Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
@@ -40,6 +41,10 @@ func (s *server) Init() error {
 		w.Write([]byte("hello world!"))
 	})
 
+	var h http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("what's wrong with you !"))
+	}
+	s.Router.NotFoundHandler = h
 	return nil
 }
 
