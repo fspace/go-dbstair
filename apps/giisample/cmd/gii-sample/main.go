@@ -5,15 +5,8 @@ import (
 	"dbstair/apps/giisample/server"
 	"fmt"
 	"github.com/pkg/errors"
-	"net/http"
 	"os"
 )
-
-// Define a home handler function which writes a byte slice containing
-// "Hello from Snippetbox"as the response body.
-func home(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello from Snippetbox"))
-}
 
 func main() {
 	if err := run(); err != nil {
