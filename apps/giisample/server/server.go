@@ -1,8 +1,10 @@
 package server
 
 import (
+	"bytes"
 	"database/sql"
 	"dbstair/apps/giisample/config"
+	"dbstair/apps/giisample/routes"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -40,12 +42,19 @@ func (s *server) Init() error {
 	// This will serve files under http://localhost:8000/static/<filename>
 	// s.Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
 
+	// 注册路由
+	routes.InitRoutes(s.Router)
+
 	s.Router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hello world!"))
 	})
 
 	var h http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("what's wrong with you !"))
+		b := bytes.NewBuffer([]byte{})
+		b.Write([]byte("what's wrong with you !\n"))
+		b.WriteString("METHOD: " + r.Method)
+
+		w.Write(b.Bytes())
 	}
 	s.Router.NotFoundHandler = h
 
