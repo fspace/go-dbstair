@@ -16,7 +16,9 @@ func main() {
 
 func run() error {
 	//  ## 加载配置
-	// https://godoc.org/github.com/coreos/etcd/pkg/fileutil   可以用fileutil检测文件的存在性
+	// https://godoc.org/github.com/coreos/etcd/pkg/fileutil    fileutil检测文件的存在性
+	// https://github.com/etcd-io/etcd/blob/master/pkg/fileutil/fileutil.go
+
 	conf, err := config.LoadConfig("./conf/app.ini")
 	if err != nil {
 		return errors.Wrap(err, "LoadConfig")

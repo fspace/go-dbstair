@@ -5,8 +5,9 @@ import (
 	"strings"
 )
 
+// TODO 有空了需要为结构体配置验证规则 这样防止脏数据从配置文件流入配置对象
 type Config struct {
-	Listen string // :6666
+	Server *ServerConfig // 内嵌其他结构体
 
 	DbUser string // = "root"
 	DbPass string // = ""
@@ -27,6 +28,11 @@ type Config struct {
 	configPaths []string
 	// \+ ========================================================================================================= +/
 }
+type ServerConfig struct {
+	Addr string
+}
+
+// ------------------------------------------------------------------------------
 
 // Configure populate the cfg object from the original configuration
 // 以此可以实现 分次提取配置
@@ -40,7 +46,7 @@ func (c *Config) Configure(cfg interface{}, section ...string) error {
 }
 
 var DefaultConfig = Config{
-	Listen: ":6666",
+	Server: &ServerConfig{Addr: ":6666"},
 
 	DbUser: "root",
 	DbPass: "",

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"dbstair/apps/giisample/config"
 	"github.com/gorilla/mux"
 	"log"
@@ -18,8 +19,10 @@ type Server interface {
 }
 
 type server struct {
+	AppContext
 	// 此处使用全局配置文件 依赖了全局配置 并不是太好但还凑合
-	// 如果把每个包看做相对独立的组件 那么都可以有自己的配置类 这样就不依赖全局配置了
+	// 如果把每个包看做相对独立的组件 那么都可以有自己的配置类 这样就不依赖全局配置了 可以使用依赖注入
+	// 思想相当于  吃食分发  由一个大娘根据条件分 还有一种情况就是 全部都端来了 你要啥自己去取 后面的方式大娘更省事
 	Config *config.Config
 	Router *mux.Router
 }
@@ -45,16 +48,19 @@ func (s *server) Init() error {
 		w.Write([]byte("what's wrong with you !"))
 	}
 	s.Router.NotFoundHandler = h
+
+	// ## 实例化db对象
+
 	return nil
 }
 
 func (s *server) Start() error {
 	// panic("implement me")
-	log.Println("server start: ...")
+	log.Printf("server start at %s : ...", s.Config.Server.Addr)
 
 	srv := &http.Server{
 		Handler: s.Router,
-		Addr:    "127.0.0.1:7777",
+		Addr:    s.Config.Server.Addr, // "127.0.0.1:7777",
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
@@ -70,3 +76,21 @@ func (server) Stop() error {
 }
 
 var _ Server = &server{}
+
+// =====================================================================================
+
+func (s *server) initDB() (*sql.DB, error) {
+	// @see https://blog.csdn.net/cj_286/article/details/80363796
+	var err error
+	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/yii_space?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		return nil, err
+	}
+	db.SetMaxOpenConns(30)
+	db.SetMaxIdleConns(10)
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
