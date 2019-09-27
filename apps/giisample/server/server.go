@@ -27,6 +27,9 @@ type server struct {
 	// 思想相当于  吃食分发  由一个大娘根据条件分 还有一种情况就是 全部都端来了 你要啥自己去取 后面的方式大娘更省事
 	Config *config.Config
 	Router *mux.Router
+
+	// 是否调用了初始化方法
+	isInitialized bool
 }
 
 func New(conf *config.Config) Server {
@@ -37,6 +40,8 @@ func New(conf *config.Config) Server {
 }
 
 func (s *server) Init() error {
+	s.isInitialized = true
+
 	// 此步里面的Router 只要满足接口条件 可以用任何出名的包来替换哦！
 	s.Router = mux.NewRouter()
 	// This will serve files under http://localhost:8000/static/<filename>
