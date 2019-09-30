@@ -23,6 +23,27 @@ The Content-Type header is particularly interesting. Go will attempt to set the 
 Note: When headers are written to a HTTP/2 connection the header names and values will always be converted to lowercase,
 - 压制系统级Header  使用del是不行的 需要直接操纵底层Map ： w.Header()["Date"]=nil
 
+### 模板
+The Block Action
+
+ we’ve used the {{template}} action to invoke one template from another. But Go also provides a 
+{{block}}...{{end}} action which you can use instead. This acts like the {{template}} action, except it allows you to
+ specify some default content if the template being invoked doesn’t exist in the current template set.
+ 
+ ~~~tpl
+ {{define "base"}}
+ <h1>An example template</h1>
+ {{block "sidebar" .}}
+    <p>My default sidebar content</p>
+ {{end}}
+ {{end}}
+~~~
+模板集中 如果定义了sidebar模板 则用之 否则用这里默认的定义  当然也可以什么都不给 空内容！
+
+> But — if you want — you don’t need to include any default content between the {{block}} and {{end}} actions. 
+In that case, the invoked template acts like it’s ‘optional’. If the template exists in the template set, 
+then it will be rendered. But if it doesn’t, then nothing will be displayed.
+
 ### 取查询串：
 - r.URL.Query().Get() method. This will always return a string value for a parameter, or the empty string "" if no matching parameter exists.
 - 验证用户的输入： strconv.Atoi() 先把字符串转化为go世界中的合适类型  然后找一款验证包吧 :)
