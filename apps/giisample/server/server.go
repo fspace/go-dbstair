@@ -9,6 +9,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -37,6 +38,12 @@ func New(conf *config.Config) Server {
 	s := &server{
 		Config: conf,
 	}
+	// 全局依赖组件实例化
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	s.InfoLog = infoLog
+	s.ErrorLog = errorLog
+
 	return s
 }
 
