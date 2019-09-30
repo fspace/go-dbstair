@@ -1,73 +1,86 @@
 package handlers
 
 import (
+	"dbstair/apps/giisample/models"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
-	"strconv"
 )
 
 type (
-	// artistService specifies the interface for the artist service needed by artistResource.
+	// userService specifies the interface for the user service needed by userController.
 	// 在多层架构中 可以同时适配dao层和service层
-	artistService interface {
-		Get(id int) (*models.Artist, error)
-		Query(offset, limit int) ([]models.Artist, error)
+	userService interface {
+		Get(id int) (*models.User, error)
+		Query(offset, limit int) ([]models.User, error)
 		Count() (int, error)
-		Create(model *models.Artist) (*models.Artist, error)
-		Update(id int, model *models.Artist) (*models.Artist, error)
-		Delete(id int) (*models.Artist, error)
+		Create(model *models.User) (*models.User, error)
+		Update(id int, model *models.User) (*models.User, error)
+		Delete(id int) (*models.User, error)
 	}
 
-	// artistResource defines the handlers for the CRUD APIs.
-	artistResource struct {
-		service artistService
+	// userController defines the handlers for the CRUD APIs.
+	userController struct {
+		service userService
 	}
 )
 
-// ServeArtist sets up the routing of artist endpoints and the corresponding handlers.
-func ServeArtistResource(r *mux.Router, service artistService) {
-	h := &artistResource{service}
-	rg.Get("/artists/<id>", r.get)
-	rg.Get("/artists", r.query)
-	rg.Post("/artists", r.create)
-	rg.Put("/artists/<id>", r.update)
-	rg.Delete("/artists/<id>", r.delete)
-
+// ServeArtist sets up the routing of user endpoints and the corresponding handlers.
+func ServeUserController(r *mux.Router /* , service artistService */) {
+	h := &userController{ /* service*/ }
 	// r := mux.NewRouter()
-	// AccessTraces
-	r.HandleFunc("access-trace/{id:[0-9]+}", h.get).Methods("GET")        // Get model by id
-	r.HandleFunc("access-trace", h.query).Methods("GET")                  // list models
-	r.HandleFunc("access-trace", h.create).Methods("POST")                // create model
-	r.HandleFunc("access-trace/{id}", h.update).Methods("PUT", "POST")    // update model
-	r.HandleFunc("access-trace/{id}", h.delete).Methods("DELETE", "POST") // delete model
+	// ServeUsers  Register the handler functions
+	r.HandleFunc("/user/{id:[0-9]+}", h.get()).Methods("GET")        // Get model by id
+	r.HandleFunc("/user", h.query()).Methods("GET")                  // list models
+	r.HandleFunc("/user", h.create()).Methods("POST")                // create model
+	r.HandleFunc("/user/{id}", h.update()).Methods("PUT", "POST")    // update model
+	r.HandleFunc("/user/{id}", h.delete()).Methods("DELETE", "POST") // delete model
 }
 
-func (r *artistResource) get() http.HandlerFunc {
-	return func(w http.ResponseWriter, request *http.Request) {
-		w.Write([]byte("get user!" + mux.Vars(request)["id"]))
+func (c *userController) get() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := mux.Vars(r)["id"]
+		_, err := w.Write([]byte("get user!" + id))
+		if err != nil {
+			log.Println("get Error:", err)
+		}
 	}
 }
 
-func (r *artistResource) query() http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-
+func (c *userController) query() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte("list user!"))
+		if err != nil {
+			log.Println("list Error:", err)
+		}
 	}
 }
 
-func (r *artistResource) create() http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-
+func (c *userController) create() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte("create user!"))
+		if err != nil {
+			log.Println("update Error:", err)
+		}
 	}
 }
 
-func (r *artistResource) update() http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-
+func (c *userController) update() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := mux.Vars(r)["id"]
+		_, err := w.Write([]byte("update user!" + id))
+		if err != nil {
+			log.Println("update Error:", err)
+		}
 	}
 }
 
-func (r *artistResource) delete() http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-
+func (c *userController) delete() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := mux.Vars(r)["id"]
+		_, err := w.Write([]byte("delete user!" + id))
+		if err != nil {
+			log.Println("delete Error:", err)
+		}
 	}
 }
