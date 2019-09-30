@@ -66,6 +66,24 @@ mux.Handle("/static/",http.StripPrefix("/static",fileServer))
 - 不推荐用全局对象 
 如果你用到了第三方库 而这些库也用了全局对象 或者偷偷替换掉了他们 你的程序或将不安全啦！ 如：http.DefaultServerMux   
 
+## flag
+Pre-Existing Variables
+
+It’s possible to parse command-line flag values into the memory addresses of pre-existing variables, using the 
+flag.StringVar(), flag.IntVar(), flag.BoolVar() and other functions.
+
+~~~go
+type Config struct{
+    Addr string
+    StaticDir string
+}
+...
+cfg := new(Config)
+flag.StringVar(&cfg.Addr,"addr",":4000","HTTP network address")
+flag.StringVar(&cfg.StaticDir,"static-dir","./ui/static","Path to static assets")
+flag.Parse()
+~~~
+
 ## 目录说明
 - handlers 类似mvc架构中的 控制器controllers 目录 
 > They’re responsible for executing your application logic and for writing HTTP response headers and bodies.
