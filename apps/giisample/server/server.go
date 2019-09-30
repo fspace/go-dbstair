@@ -6,6 +6,7 @@ import (
 	"dbstair/apps/giisample/config"
 	"dbstair/apps/giisample/routes"
 	"github.com/gorilla/mux"
+	"html/template"
 	"log"
 	"net/http"
 	"time"
@@ -51,7 +52,22 @@ func (s *server) Init() error {
 	routes.InitRoutes(s.Router)
 
 	s.Router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello world!"))
+		// w.Write([]byte("hello world!"))
+		// 这里的目录相对于main.go 的目录哦！ // 或者给一个绝对路径！
+		ts, err := template.ParseFiles("../../ui/html/home.page.tmpl")
+		if err != nil {
+			log.Println(err.Error())
+			http.Error(w, "Internal Server Error", 500)
+			return
+		}
+
+		// We then use the Execute() method on the template set to write the template
+		// content as the response body. The last parameter to Execute() represents any
+		// dynamic data that we want to pass in, which for now we'll leave as nil.
+		err = ts.Execute(w, nil)
+		if err != nil {
+			log.Println("ts.Execute Error: ", err)
+		}
 	})
 
 	var h http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
