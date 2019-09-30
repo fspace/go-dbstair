@@ -62,6 +62,11 @@ func (s *server) Init() error {
 	routes.InitRoutes(s.Router)
 
 	s.Router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			s.notFound(w) // Use the notFound() helper
+			return
+		}
+
 		// w.Write([]byte("hello world!"))
 		// 这里的目录相对于main.go 的目录哦！ // 或者给一个绝对路径！
 		// Initialize a slice containing the paths to the two files. Note that the
@@ -77,14 +82,16 @@ func (s *server) Init() error {
 		ts, err := template.ParseFiles(files...)
 		if err != nil {
 			log.Println(err.Error())
-			http.Error(w, "Internal Server Error", 500)
+			// http.Error(w, "Internal Server Error", 500)
+			s.serverError(w, err) // Use the serverError() helper.
 			return
 		}
 
 		err = ts.Execute(w, nil)
 		if err != nil {
 			log.Println(err.Error())
-			http.Error(w, "Internal Server Error", 500)
+			// http.Error(w, "Internal Server Error", 500)
+			s.serverError(w, err) // Use the serverError() helper.
 		}
 	})
 
