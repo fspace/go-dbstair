@@ -44,6 +44,20 @@ The Block Action
 In that case, the invoked template acts like it’s ‘optional’. If the template exists in the template set, 
 then it will be rendered. But if it doesn’t, then nothing will be displayed.
 
+### 创建文件服务：
+
+~~~go
+// Create a file server which serves files out of the "./ui/static"directory.
+// Note that the path given to the http.Dir function is relative to the project
+// directory root.
+fileServer:=http.FileServer(http.Dir("./ui/static/"))
+
+// Use the mux.Handle() function to register the file server as the handler for
+// all URL paths that start with "/static/". For matching paths, we strip the
+// "/static"prefix before the request reaches the file server.
+mux.Handle("/static/",http.StripPrefix("/static",fileServer))
+~~~
+
 ### 取查询串：
 - r.URL.Query().Get() method. This will always return a string value for a parameter, or the empty string "" if no matching parameter exists.
 - 验证用户的输入： strconv.Atoi() 先把字符串转化为go世界中的合适类型  然后找一款验证包吧 :)

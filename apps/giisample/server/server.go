@@ -48,6 +48,9 @@ func (s *server) Init() error {
 	// This will serve files under http://localhost:8000/static/<filename>
 	// s.Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
 
+	staticDir := "../../ui/static" // 可来自配置文件或者 flag
+	s.Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(staticDir))))
+
 	// 注册路由
 	routes.InitRoutes(s.Router)
 
