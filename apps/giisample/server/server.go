@@ -26,7 +26,7 @@ type Server interface {
 }
 
 type server struct {
-	core.Application // FIXME 这里曾经发生过很怪异的错误 不可用用指针类型 不然下面就会报错 https://blog.csdn.net/weixin_30241919/article/details/97273225
+	core.Application // 使用内嵌指针的话如果层级超过两个比如 server.Application.Config 需要先为中间的那个内嵌对象准备好地址！
 	// 是否调用了初始化方法
 	isInitialized bool
 }
@@ -35,10 +35,8 @@ type server struct {
 
 func New(conf *config.Config) Server {
 	s := &server{}
-	//log.Printf("shahha:%#v ",conf)
-	//os.Exit(22222)
-	s.Config = conf
-	// os.Exit(2222)
+	s.Config = conf // 内嵌结构体的话可以跃层赋值  但内嵌指针的话需要一层层赋值 &server{ Application: &Application{Config: conf} }
+
 	// 全局依赖组件实例化
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
