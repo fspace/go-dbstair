@@ -10,13 +10,17 @@ import (
 type (
 	// userService specifies the interface for the user service needed by userController.
 	// 在多层架构中 可以同时适配dao层和service层
+	// FIXME 这个接口是临时修改的 先跟dao适配一下 后期如果添加service层 则接口稍有不同
 	userService interface {
 		Get(id int) (*models.User, error)
 		Query(offset, limit int) ([]models.User, error)
 		Count() (int, error)
-		Create(model *models.User) (*models.User, error)
-		Update(id int, model *models.User) (*models.User, error)
-		Delete(id int) (*models.User, error)
+		// Create(model *models.User) (*models.User, error) // 注意这个是跟service层不同的地方 在强哥的实现中多了一次查询 先create再get
+		Create(model *models.User) error
+		//Update(id int, model *models.User) (*models.User, error)
+		Update(id int, model *models.User) error
+		// Delete(id int) (*models.User, error)
+		Delete(id int) error // 删除在服务类的实现中 也是先get 在delete 最后返回被删掉的对象
 	}
 
 	// userController defines the handlers for the CRUD APIs.
@@ -26,8 +30,8 @@ type (
 )
 
 // ServeArtist sets up the routing of user endpoints and the corresponding handlers.
-func ServeUserController(r *mux.Router /* , service artistService */) {
-	h := &userController{ /* service*/ }
+func ServeUserController(r *mux.Router, service userService) {
+	h := &userController{service}
 	// r := mux.NewRouter()
 	// ServeUsers  Register the handler functions
 	r.HandleFunc("/user/{id:[0-9]+}", h.get()).Methods("GET")        // Get model by id

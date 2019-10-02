@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"dbstair/apps/giisample/config"
+	"dbstair/apps/giisample/core"
 	"dbstair/apps/giisample/routes"
 	"github.com/gorilla/mux"
 	"html/template"
@@ -11,6 +12,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // @see https://github.com/nytimes/gizmo/blob/master/server/server.go
@@ -23,27 +26,26 @@ type Server interface {
 }
 
 type server struct {
-	AppContext
-	// 此处使用全局配置文件 依赖了全局配置 并不是太好但还凑合
-	// 如果把每个包看做相对独立的组件 那么都可以有自己的配置类 这样就不依赖全局配置了 可以使用依赖注入
-	// 思想相当于  吃食分发  由一个大娘根据条件分 还有一种情况就是 全部都端来了 你要啥自己去取 后面的方式大娘更省事
-	Config *config.Config
-	Router *mux.Router
-
+	core.Application // FIXME 这里曾经发生过很怪异的错误 不可用用指针类型 不然下面就会报错 https://blog.csdn.net/weixin_30241919/article/details/97273225
 	// 是否调用了初始化方法
 	isInitialized bool
 }
 
+//type Application = server // 导出内部类型为Application 因为要挎包访问了
+
 func New(conf *config.Config) Server {
-	s := &server{
-		Config: conf,
-	}
+	s := &server{}
+	//log.Printf("shahha:%#v ",conf)
+	//os.Exit(22222)
+	s.Config = conf
+	// os.Exit(2222)
 	// 全局依赖组件实例化
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 	s.InfoLog = infoLog
 	s.ErrorLog = errorLog
 
+	log.Println("new server with config ")
 	return s
 }
 
@@ -52,14 +54,24 @@ func (s *server) Init() error {
 
 	// 此步里面的Router 只要满足接口条件 可以用任何出名的包来替换哦！
 	s.Router = mux.NewRouter()
+
+	// 全局中间件:
+	s.Router.Use(loggingMiddleware)
+
 	// This will serve files under http://localhost:8000/static/<filename>
 	// s.Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
 
 	staticDir := "../../ui/static" // 可来自配置文件或者 flag
 	s.Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(staticDir))))
 
+	var err error
+	s.DB, err = s.initDB()
+	if err != nil {
+		return err
+	}
+
 	// 注册路由
-	routes.InitRoutes(s.Router)
+	routes.InitRoutes(s.Router, &s.Application)
 
 	s.Router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
@@ -148,4 +160,14 @@ func (s *server) initDB() (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Do stuff here
+		log.Println(r.RequestURI)
+		log.Println("每次请求都有哈  requestScope 级别的东西 就可以放这里拉！")
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		next.ServeHTTP(w, r)
+	})
 }

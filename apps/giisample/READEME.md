@@ -84,6 +84,19 @@ flag.StringVar(&cfg.StaticDir,"static-dir","./ui/static","Path to static assets"
 flag.Parse()
 ~~~
 
+## main函数在web应用中主要做的几件事情
+
+main() function are limited to:
+• Parsing the runtime configuration settings for the application;
+• Establishing the dependencies for the handlers; and
+• Running the HTTP server.
+
+## 中间件
+依赖注入 还有一种特殊用法  
+就是中间件方式  上游注入需要的组件 变量 下游来取  可以参考这里：[server.go](https://github.com/qiangxue/golang-restful-starter-kit/blob/master/server.go#L59)
+mux 库使用中间件的方式 可以参考这里： https://www.jianshu.com/p/8ade70e51210
+
+
 ## 目录说明
 - handlers 类似mvc架构中的 控制器controllers 目录 
 > They’re responsible for executing your application logic and for writing HTTP response headers and bodies.

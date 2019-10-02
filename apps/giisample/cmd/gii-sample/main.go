@@ -40,7 +40,7 @@ func run() error {
 	if err != nil {
 		return errors.Wrap(err, "LoadConfig")
 	}
-	_ = conf
+	// _ = conf
 	fmt.Printf("config: %#v", conf)
 
 	// ## 实例化 全局组件 或者server依赖的组件  后期考虑依赖注入
@@ -65,7 +65,7 @@ func run() error {
 	svr := server.New(conf)
 	err = svr.Init()
 	if err != nil {
-		return nil
+		return err
 	}
 	return svr.Start()
 }

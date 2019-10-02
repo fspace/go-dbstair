@@ -1,12 +1,14 @@
 package routes
 
 import (
+	"dbstair/apps/giisample/core"
+	"dbstair/apps/giisample/daos/mysql"
 	"dbstair/apps/giisample/handlers"
 	"github.com/gorilla/mux"
 )
 
 // InitRoutes buildRouter for mux
-func InitRoutes(r *mux.Router) {
+func InitRoutes(r *mux.Router, app *core.Application) {
 	// ## for userHandler
 	// 可以用curl请求测试： curl localhost:6666/user/create -X PUT|POST|DELETE -v
 	//r.HandleFunc("/user/list", func(w http.ResponseWriter, r *http.Request) {
@@ -30,6 +32,6 @@ func InitRoutes(r *mux.Router) {
 	//	log.Println(  fmt.Sprintf("%#v", route)  )
 	//	return nil
 	//})
-	handlers.ServeUserController(r)
+	handlers.ServeUserController(r, mysql.NewUserDAO(app.DB))
 
 }
