@@ -3,8 +3,10 @@ package handlers
 import (
 	"dbstair/apps/giisample/models"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type (
@@ -48,6 +50,16 @@ func (c *userController) get() http.HandlerFunc {
 		if err != nil {
 			log.Println("get Error:", err)
 		}
+
+		idInt, err := strconv.Atoi(id)
+		if err != nil {
+			log.Println("Atoi Error: ", err)
+		}
+		m, err := c.service.Get(idInt)
+		if err != nil {
+			log.Println("service.Get Error: ", err)
+		}
+		log.Printf("%#v", m)
 	}
 }
 
@@ -62,10 +74,34 @@ func (c *userController) query() http.HandlerFunc {
 
 func (c *userController) create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_, err := w.Write([]byte("create user!"))
+		//_, err := w.Write([]byte("create user ssss!"))
+		//if err != nil {
+		//	log.Println("create Error:", err)
+		//}
+		var err error
+		err = r.ParseForm()
 		if err != nil {
-			log.Println("update Error:", err)
+			// Handle error
+			log.Println("ParseForm ERROR:", err) // TODO 这个需要通知客户端 解析表单出问题了
 		}
+		log.Println("??????")
+		// 需要表单数据填充啦
+		model := new(models.User)
+		decoder := schema.NewDecoder() // 推荐这个作为全局包级组件 它会缓存结构体元数据的 可安全共享同一个实例
+
+		log.Printf("post data: %#v ", r.PostForm)
+
+		// r.PostForm is a map of our POST form values
+		err = decoder.Decode(model, r.PostForm)
+		if err != nil {
+			log.Println("Decode ERROR:", err)
+		}
+		log.Printf("filled model: %#v ", model)
+		err = c.service.Create(model)
+		if err != nil {
+			log.Println("create model err: ", err)
+		}
+		w.Write([]byte("create user ssss!"))
 	}
 }
 
