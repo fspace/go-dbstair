@@ -7,9 +7,12 @@ require (
 	github.com/go-ozzo/ozzo-config v0.0.0-20160627170238-0ff174cf5aa6 // indirect
 	github.com/go-ozzo/ozzo-di v0.0.0-20160627172736-38d85257b067 // indirect
 	github.com/go-redis/redis v6.15.2+incompatible // indirect
+	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gorilla/mux v1.7.3
+	github.com/gorilla/schema v1.1.0
 	github.com/hnakamur/jsonpreprocess v0.0.0-20171017030034-a4e954386171 // indirect
 	github.com/prometheus/common v0.6.0
 	github.com/urfave/cli v1.20.0 // indirect
+	gopkg.in/guregu/null.v3 v3.4.0
 	gopkg.in/ini.v1 v1.48.0
 )

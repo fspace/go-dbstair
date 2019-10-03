@@ -113,3 +113,4 @@ mux 库使用中间件的方式 可以参考这里： https://www.jianshu.com/p/
 ## 参考：
 - https://github.com/kelseyhightower/ipxed/blob/master/api/server.go
 - https://github.com/qiangxue/golang-restful-starter-kit/blob/master/apis/artist.go
+- 文件结构： http://idiomaticgo.com/post/best-practice/server-project-layout/

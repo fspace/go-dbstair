@@ -61,12 +61,28 @@ func (dao *UserDAO) Create(model *models.User) error {
 }
 
 // Update saves the changes to an user in the database.
-func (dao *UserDAO) Update( /* rs app.RequestScope,*/ id int, user *models.User) error {
+func (dao *UserDAO) Update( /* rs app.RequestScope,*/ id int, model *models.User) error {
 	if _, err := dao.Get(id); err != nil {
 		return err
 	}
-	user.Id = id
-	// return rs.Tx().Model(user).Exclude("Id").Update()
+
+	stmt, err := dao.DB.Prepare(`UPDATE user SET username=?, email=?, password_hash=?, auth_key=?, confirmed_at=?,
+ unconfirmed_email=?, blocked_at=?, registration_ip=?, flags=?, status=?, password_reset_token=?, created_at=?, updated_at=? WHERE id=? `)
+	if err != nil {
+		return err
+	}
+	res, err := stmt.Exec(model.Username, model.Email, model.PasswordHash, model.AuthKey,
+		model.ConfirmedAt, model.UnconfirmedEmail, model.BlockedAt, model.RegistrationIp, model.Flags, model.Status,
+		model.PasswordResetToken, model.CreatedAt, model.UpdatedAt, id)
+
+	if err != nil {
+		return err
+	}
+	rowCnt, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	log.Printf("ID = %d, affected = %d\n", id, rowCnt)
 	return nil
 }
 
@@ -77,7 +93,20 @@ func (dao *UserDAO) Delete(id int) error {
 		return err
 	}
 	_ = model
-	// return rs.Tx().Model(--><!--).Delete()-->
+	stmt, err := dao.DB.Prepare("DELETE FROM user WHERE id=?")
+	if err != nil {
+		return err
+	}
+
+	res, err := stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	rowCnt, err := res.RowsAffected()
+	if err != nil {
+		return err // log.Fatal(err)
+	}
+	log.Printf("ID = %d, affected = %d\n", id, rowCnt)
 	return nil
 }
 
