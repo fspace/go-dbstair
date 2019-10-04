@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"dbstair/apps/giisample/models"
+	"dbstair/apps/giisample/utils/webutil"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
 	"log"
@@ -68,10 +70,22 @@ func (c *userController) get() http.HandlerFunc {
 
 func (c *userController) query() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_, err := w.Write([]byte("list user!"))
-		if err != nil {
-			log.Println("list Error:", err)
+
+		sm := models.User{}
+		decoder := schema.NewDecoder()
+		if err := decoder.Decode(&sm, r.URL.Query()); err != nil {
+			fmt.Println(err)
+			return
 		}
+		log.Printf("%#v \n", sm)
+
+		users, err := c.service.Query(0, 100)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		webutil.ServeJson(w, users)
+		// w.Write([]byte("list user!"))
+
 	}
 }
 

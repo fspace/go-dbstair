@@ -5,6 +5,7 @@ import (
 	// "github.com/qiangxue/golang-restful-starter-kit/models"
 	"database/sql"
 	"dbstair/apps/giisample/models"
+	"fmt"
 	"log"
 )
 
@@ -114,13 +115,36 @@ func (dao *UserDAO) Delete(id int) error {
 func (dao *UserDAO) Count( /* rs app.RequestScope*/ ) (int, error) {
 	var count int
 	// err := rs.Tx().Select("COUNT(*)").From("user").Row(&count)
+	// TODO 后续可以传递一个搜索模型 继续添加 WHERE 子句部分
+	err := dao.DB.QueryRow("SELECT COUNT(*) FROM user").
+		Scan(&count)
+	if err != nil {
+		return 0, err
+	}
 	return count, nil
 }
 
 // Query retrieves the user records with the specified offset and limit from the database.
 func (dao *UserDAO) Query( /*qm queryModel*/ offset, limit int) ([]models.User, error) {
-	models := []models.User{}
+	rs := []models.User{}
 	// err := rs.Tx().Select().OrderBy("id").Offset(int64(offset)).Limit(int64(limit)).All(&models)
+	querySql := fmt.Sprintf("SELECT id, username, email, password_hash, auth_key, confirmed_at,"+
+		" unconfirmed_email, blocked_at, registration_ip, flags, status, password_reset_token, created_at, updated_at FROM user LIMIT %d OFFSET %d", limit, offset)
+	rows, err := dao.DB.Query(querySql)
+	if err != nil {
+		return rs, err
+	}
 
-	return models, nil
+	var model models.User
+	for rows.Next() {
+		err = rows.Scan(&model.Id, &model.Username, &model.Email, &model.PasswordHash, &model.AuthKey, &model.ConfirmedAt,
+			&model.UnconfirmedEmail, &model.BlockedAt, &model.RegistrationIp, &model.Flags, &model.Status,
+			&model.PasswordResetToken, &model.CreatedAt, &model.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+		rs = append(rs, model)
+	}
+
+	return rs, nil
 }

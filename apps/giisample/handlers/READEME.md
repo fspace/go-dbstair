@@ -1,6 +1,9 @@
 handlers
 ---
 
+CRUD 结构参考
+- https://www.jdon.com/48661 | https://github.com/thanhngvpt/famcost/blob/master/handlers.go
+
 本包类似其他web程序的控制器controllers包
 
 对于依赖注入问题
