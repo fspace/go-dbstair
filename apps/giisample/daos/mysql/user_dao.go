@@ -126,6 +126,7 @@ func (dao *UserDAO) Count( /* rs app.RequestScope*/ ) (int, error) {
 
 // Query retrieves the user records with the specified offset and limit from the database.
 func (dao *UserDAO) Query( /*qm queryModel*/ offset, limit int) ([]models.User, error) {
+	// http://go-database-sql.org/retrieving.html
 	rs := []models.User{}
 	// err := rs.Tx().Select().OrderBy("id").Offset(int64(offset)).Limit(int64(limit)).All(&models)
 	querySql := fmt.Sprintf("SELECT id, username, email, password_hash, auth_key, confirmed_at,"+
@@ -134,17 +135,31 @@ func (dao *UserDAO) Query( /*qm queryModel*/ offset, limit int) ([]models.User, 
 	if err != nil {
 		return rs, err
 	}
+	defer rows.Close()
+	//defer func() {
+	//	if rows != nil {
+	//		rows.Close()   //关闭掉未scan的sql连接
+	//	}
+	//}()
 
-	var model models.User
+	// var model models.User
 	for rows.Next() {
+		var model models.User // 感觉声明在这里是新的  但声明在外面好像也不影响！
 		err = rows.Scan(&model.Id, &model.Username, &model.Email, &model.PasswordHash, &model.AuthKey, &model.ConfirmedAt,
 			&model.UnconfirmedEmail, &model.BlockedAt, &model.RegistrationIp, &model.Flags, &model.Status,
 			&model.PasswordResetToken, &model.CreatedAt, &model.UpdatedAt)
 		if err != nil {
+			// FIXME 有人这里都使用的continue
+			//log.Println(err)
+			//continue
 			return nil, err
 		}
 		rs = append(rs, model)
 	}
-
+	// rows.Close() // 要关不？
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
 	return rs, nil
 }

@@ -24,6 +24,7 @@ Note: When headers are written to a HTTP/2 connection the header names and value
 - 压制系统级Header  使用del是不行的 需要直接操纵底层Map ： w.Header()["Date"]=nil
 
 ### 模板
+TODO 这是要对模板文件的改造 有空了做掉哦！
 The Block Action
 
  we’ve used the {{template}} action to invoke one template from another. But Go also provides a 
@@ -96,6 +97,10 @@ main() function are limited to:
 就是中间件方式  上游注入需要的组件 变量 下游来取  可以参考这里：[server.go](https://github.com/qiangxue/golang-restful-starter-kit/blob/master/server.go#L59)
 mux 库使用中间件的方式 可以参考这里： https://www.jianshu.com/p/8ade70e51210
 
+
+## 应用生命周期
+有的时候 其他组件也想参与引用的生命周期  比如在main函数结束时做一些资源收尾工作 事件机制貌似看起来比较合理 那么问题就是这些组件
+如何才能监听到应用的生命周期事件呢 ！如何实现！
 
 ## 目录说明
 - handlers 类似mvc架构中的 控制器controllers 目录 

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
+	"github.com/pkg/errors"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -49,28 +51,57 @@ func ServeUserController(r *mux.Router, service userService) {
 }
 
 func (c *userController) get() http.HandlerFunc {
+	// Initialize a slice containing the paths to the show.page.tmpl file,
+	// plus the base layout and footer partial that we made earlier.
+	files := []string{
+		"../../ui/html/user/show.page.tmpl",
+		"../../ui/html/base.layout.tmpl",
+		"../../ui/html/footer.partial.tmpl",
+	}
+	// Parse the template files...
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		//	app.serverError(w,err)
+		log.Fatalln("template.ParseFiles ERROR: ", err)
+		return nil
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := mux.Vars(r)["id"]
-		_, err := w.Write([]byte("get user!" + id))
-		if err != nil {
-			log.Println("get Error:", err)
-		}
-
+		//
+		//_, err := w.Write([]byte("get user!" + id))
+		//if err != nil {
+		//	log.Println("get Error:", err)
+		//}
 		idInt, err := strconv.Atoi(id)
 		if err != nil {
-			log.Println("Atoi Error: ", err)
+			//log.Println("Atoi Error: ", err)
+			http.Error(w, errors.Wrap(err, "Atoi Error").Error(), http.StatusBadRequest)
 		}
 		m, err := c.service.Get(idInt)
 		if err != nil {
-			log.Println("service.Get Error: ", err)
+			// log.Println("service.Get Error: ", err)
+			// http.Error(w, err.Error(), http.StatusInternalServerError)
+			webutil.NotFound(w)
+			return
 		}
-		log.Printf("%#v", m)
+		// log.Printf("%#v", m)
+		// webutil.ServeJson(w,m)
+
+		// And then execute them. Notice how we are passing in the snippet
+		// data (a models.Snippet struct) as the final parameter.
+		err = ts.Execute(w, m)
+		if err != nil {
+			// app.serverError(w,err)
+			webutil.ServerError(w, err)
+		}
 	}
 }
 
 func (c *userController) query() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		if r.Method != "GET" {
+			http.Error(w, "Method not allowed", http.StatusBadRequest)
+		}
 		sm := models.User{}
 		decoder := schema.NewDecoder()
 		if err := decoder.Decode(&sm, r.URL.Query()); err != nil {

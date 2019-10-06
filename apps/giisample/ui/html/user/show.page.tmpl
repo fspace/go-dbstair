@@ -1,0 +1,52 @@
+{{template "base" .}}
+
+        {{define "title"}} User #{{.Id}} {{end}}
+
+        {{define "body"}}
+<div class='user'>
+    <dl>
+        <dt>id</dt>
+        <dd>{{.Id}}</dd>
+
+        <dt>username</dt>
+        <dd>{{.Username}}</dd>
+
+        <dt>email</dt>
+        <dd>{{.Email}}</dd>
+
+        <dt>password_hash</dt>
+        <dd>{{.PasswordHash}}</dd>
+
+        <dt>auth_key</dt>
+        <dd>{{.AuthKey}}</dd>
+
+        <dt>confirmed_at</dt>
+        <dd>{{.ConfirmedAt}}</dd>
+
+        <dt>unconfirmed_email</dt>
+        <dd>{{.UnconfirmedEmail}}</dd>
+
+        <dt>blocked_at</dt>
+        <dd>{{.BlockedAt}}</dd>
+
+        <dt>registration_ip</dt>
+        <dd>{{.RegistrationIp}}</dd>
+
+        <dt>flags</dt>
+        <dd>{{.Flags}}</dd>
+
+        <dt>status</dt>
+        <dd>{{.Status}}</dd>
+
+        <dt>password_reset_token</dt>
+        <dd>{{.PasswordResetToken}}</dd>
+
+        <dt>created_at</dt>
+        <dd>{{.CreatedAt}}</dd>
+
+        <dt>updated_at</dt>
+        <dd>{{.UpdatedAt}}</dd>
+
+    </dl>
+</div>
+        {{end}}
