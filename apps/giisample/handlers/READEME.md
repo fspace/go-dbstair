@@ -35,3 +35,9 @@ func (c *MyController) Delete2( app Application ) http.HandlerFunc {
     }
 }
 ~~~
+
+## The r.Form Map
+r.PostForm map is populated only for POST, PATCH and PUT requests, and contains the form data from the request body.
+
+r.Form 是方法无关的  但body会覆盖get同名数据
+get传参 body 过来的数据 二者混揉一起的 可以测试下  有些场景下 这个特性还是比较有意义的 不需要你自己混合get+post了 

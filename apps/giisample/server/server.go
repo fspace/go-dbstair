@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"dbstair/apps/giisample/config"
 	"dbstair/apps/giisample/core"
+	"dbstair/apps/giisample/mws"
 	"dbstair/apps/giisample/routes"
 	"github.com/gorilla/mux"
 	"html/template"
@@ -54,7 +55,10 @@ func (s *server) Init() error {
 	s.Router = mux.NewRouter()
 
 	// 全局中间件:
-	s.Router.Use(loggingMiddleware)
+	//s.Router.Use(loggingMiddleware)
+	s.Router.Use(s.recoverPanic)
+	s.Router.Use(s.logRequest)
+	s.Router.Use(mws.SecureHeaders)
 
 	// This will serve files under http://localhost:8000/static/<filename>
 	// s.Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
