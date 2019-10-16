@@ -37,7 +37,7 @@ func FilterCond(cond squirrel.Sqlizer) squirrel.Sqlizer {
 			return squirrel.Eq{}
 		}
 	default:
-		return cond
+		return cond // 这里就是凑结构的 可以删掉default 子句
 	}
 	return cond
 }
